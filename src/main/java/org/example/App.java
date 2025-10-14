@@ -1,11 +1,27 @@
 package org.example;
 
-/**
- * A simple application entry point that prints "Hello World!" to the console.
- */
+import org.example.board.Board;
+import org.example.model.Move;
+
+import java.util.Scanner;
 
 public class App {
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        Scanner sc = new Scanner(System.in);
+        Board board = new Board(10, 10);
+
+        System.out.println("Üdv az én amőba játékomban!");
+        board.printBoard();
+
+        while (true) {
+            System.out.print("Add meg a sor és oszlop indexet (pl. 1 1): ");
+            int r = sc.nextInt() - 1;
+            int c = sc.nextInt() -1;
+
+            if (!board.applyMove(new Move(r, c), 'X')) {
+                System.out.println("Érvénytelen lépés!");
+            }
+            board.printBoard();
+        }
     }
 }
