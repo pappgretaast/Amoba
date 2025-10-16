@@ -12,7 +12,9 @@ public class App {
 
         System.out.println("Üdv az én amőba játékomban!");
         board.printBoard();
-
+        System.out.println("Kérem a nevedet: ");
+        String nev = sc.nextLine();
+        System.out.println("Szia, "+nev+"!");
         while (true) {
             System.out.print("Add meg a sor és oszlop indexet (pl. 1 1): ");
             int r = sc.nextInt() - 1;
