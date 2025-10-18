@@ -1,7 +1,10 @@
 package org.example.board;
 
 import org.example.model.Move;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /** Represents the game board. */
 public class Board {
@@ -104,4 +107,25 @@ public class Board {
             System.out.println();
         }
     }
+
+    public List<String> serialize() {
+        List<String> lines = new ArrayList<>();
+        for (int r = 0; r < rows; r++) {
+            lines.add(new String(board[r]));
+        }
+        return lines;
+    }
+
+    public void deserialize(List<String> lines) {
+        for (int r = 0; r < Math.min(rows, lines.size()); r++) {
+            char[] rowChars = lines.get(r).toCharArray();
+            for (int c = 0; c < Math.min(columns, rowChars.length); c++) {
+                board[r][c] = rowChars[c];
+                if (rowChars[c] != '.') {
+                    firstMovePlaced = true; // Ha volt már lépés
+                }
+            }
+        }
+    }
+
 }

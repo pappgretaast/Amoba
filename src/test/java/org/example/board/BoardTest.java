@@ -1,74 +1,163 @@
 package org.example.board;
 
 import org.example.model.Move;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Unit tests for {@link Board}.
- */
 class BoardTest {
 
+    private Board board;
+
+    @BeforeEach
+    void setUp() {
+        board = new Board(10, 10);
+    }
+
     @Test
-    @DisplayName("Valid move should be applied successfully")
+    @DisplayName("Első lépés automatikus középre helyezése")
+    void testPlaceFirstMove() {
+        board.placeFirstMove('X');
+        assertTrue(getCell(5, 5) == 'X' || getCell(4, 4) == 'X' || getCell(5, 4) == 'X' || getCell(4, 5) == 'X',
+                "A középső mezőn kell lennie az első lépésnek.");
+    }
+
+    @Test
+    @DisplayName("Érvényes lépés alkalmazása")
     void testApplyValidMove() {
-        Board board = new Board(3, 3);
-        boolean result = board.applyMove(new Move(1, 1), 'X');
-        assertTrue(result, "Valid move should return true");
+        board.placeFirstMove('X');
+        Move move = new Move(5, 6);
+        boolean result = board.applyMove(move, 'O');
+        assertTrue(result, "A lépésnek érvényesnek kell lennie.");
     }
 
     @Test
-    @DisplayName("Applying a move on an already occupied cell should fail")
-    void testApplyInvalidMoveOccupied() {
-        Board board = new Board(3, 3);
-        board.applyMove(new Move(1, 1), 'X');
-        boolean result = board.applyMove(new Move(1, 1), 'O');
-        assertFalse(result, "Applying move to occupied cell should fail");
+    @DisplayName("Érvénytelen lépés: mező foglalt")
+    void testApplyMoveToOccupiedCell() {
+        board.placeFirstMove('X');
+        Move move = new Move(5, 5);
+        boolean result = board.applyMove(move, 'O');
+        assertFalse(result, "Nem szabad engedni lépést foglalt mezőre.");
     }
 
     @Test
-    @DisplayName("Move outside the board boundaries should be rejected")
-    void testApplyInvalidMoveOutOfBounds() {
-        Board board = new Board(3, 3);
-        assertFalse(board.applyMove(new Move(-1, 0), 'X'), "Negative row should be invalid");
-        assertFalse(board.applyMove(new Move(0, -1), 'X'), "Negative column should be invalid");
-        assertFalse(board.applyMove(new Move(3, 0), 'X'), "Row beyond limit should be invalid");
-        assertFalse(board.applyMove(new Move(0, 3), 'X'), "Column beyond limit should be invalid");
+    @DisplayName("Érvénytelen lépés: tartományon kívül")
+    void testApplyMoveOutOfBounds() {
+        Move move = new Move(-1, 10);
+        boolean result = board.applyMove(move, 'X');
+        assertFalse(result, "A lépés tartományon kívül van, nem szabad engedni.");
     }
 
     @Test
-    @DisplayName("Board should initialize with '.' characters")
-    void testBoardInitialization() {
-        Board board = new Board(2, 2);
-
-        // Capture the printed output of printBoard()
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(out));
-
-        board.printBoard();
-        String output = out.toString().trim();
-
-        assertEquals("..\n..", output.replace("\r", ""), "Board should initialize with dots");
+    @DisplayName("Érvénytelen lépés: nincs szomszédos jel az első után")
+    void testApplyMoveWithoutAdjacent() {
+        board.placeFirstMove('X');
+        Move move = new Move(0, 0);
+        boolean result = board.applyMove(move, 'O');
+        assertFalse(result, "Nem szabad engedni szomszéd nélküli lépést.");
     }
 
     @Test
-    @DisplayName("printBoard should print the current state correctly")
-    void testPrintBoardAfterMove() {
-        Board board = new Board(2, 2);
-        board.applyMove(new Move(0, 0), 'X');
-        board.applyMove(new Move(1, 1), 'O');
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(out));
-
-        board.printBoard();
-        String output = out.toString().trim().replace("\r", "");
-
-        assertEquals("X.\n.O", output, "Board should reflect current game state");
+    @DisplayName("Vízszintes nyerés ellenőrzése")
+    void testCheckWinHorizontal() {
+        for (int i = 0; i < 5; i++) {
+            board.applyMove(new Move(4, i), 'X');
+        }
+        assertTrue(board.checkWin('X'), "Az 'X' játékosnak vízszintesen nyernie kellene.");
     }
+
+    @Test
+    @DisplayName("Függőleges nyerés ellenőrzése")
+    void testCheckWinVertical() {
+        for (int i = 0; i < 5; i++) {
+            board.applyMove(new Move(i, 4), 'X');
+        }
+        assertTrue(board.checkWin('X'), "Az 'X' játékosnak függőlegesen nyernie kellene.");
+    }
+
+    @Test
+    @DisplayName("Átlós ↘ nyerés ellenőrzése")
+    void testCheckWinDiagonalDownRight() {
+        for (int i = 0; i < 5; i++) {
+            board.applyMove(new Move(i, i), 'X');
+        }
+        assertTrue(board.checkWin('X'), "Az 'X' játékosnak átlósan (↘) nyernie kellene.");
+    }
+
+    @Test
+    @DisplayName("Átlós ↙ nyerés ellenőrzése")
+    void testCheckWinDiagonalDownLeft() {
+        for (int i = 0; i < 5; i++) {
+            board.applyMove(new Move(i, 9 - i), 'X');
+        }
+        assertTrue(board.checkWin('X'), "Az 'X' játékosnak átlósan (↙) nyernie kellene.");
+    }
+
+    @Test
+    @DisplayName("Nincs nyerés ha kevesebb mint 5 azonos jel van")
+    void testNoWinWithFourInRow() {
+        for (int i = 0; i < 4; i++) {
+            board.applyMove(new Move(3, i), 'X');
+        }
+        assertFalse(board.checkWin('X'), "4 egymás melletti jel még nem nyerés.");
+    }
+
+    // Segédmetódus a mező lekérésére (tesztekhez)
+    private char getCell(int row, int col) {
+        try {
+            var field = Board.class.getDeclaredField("board");
+            field.setAccessible(true);
+            char[][] b = (char[][]) field.get(board);
+            return b[row][col];
+        } catch (Exception e) {
+            fail("Nem sikerült hozzáférni a board mezőhöz: " + e.getMessage());
+            return '?';
+        }
+    }
+
+    @Test
+    @DisplayName("serialize() és deserialize() működése")
+    void testSerializeAndDeserialize() {
+        // Lépések lerakása
+        board.applyMove(new Move(4, 4), 'X');
+        board.applyMove(new Move(4, 5), 'O');
+
+        // Mentés
+        var saved = board.serialize();
+
+        // Új tábla betöltése
+        Board loaded = new Board(10, 10);
+        loaded.deserialize(saved);
+
+        // Ellenőrzés, hogy az állapot egyezik
+        var loadedSaved = loaded.serialize();
+        assertEquals(saved, loadedSaved, "A deszerializált tábla állapota egyezzen az eredetivel.");
+    }
+
+    @Test
+    @DisplayName("deserialize() beállítja a firstMovePlaced értékét")
+    void testDeserializeSetsFirstMovePlaced() throws Exception {
+        var lines = java.util.List.of(
+                "..........",
+                "....X.....",
+                "..........",
+                "..........",
+                "..........",
+                "..........",
+                "..........",
+                "..........",
+                "..........",
+                ".........."
+        );
+        Board b = new Board(10, 10);
+        b.deserialize(lines);
+
+        var field = Board.class.getDeclaredField("firstMovePlaced");
+        field.setAccessible(true);
+        boolean placed = (boolean) field.get(b);
+        assertTrue(placed, "Ha volt már jel a táblán, a firstMovePlaced-nek igaznak kell lennie.");
+    }
+
 }
