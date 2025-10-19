@@ -78,21 +78,21 @@ class BoardTest {
     }
 
     @Test
-    @DisplayName("Átlós ↘ nyerés ellenőrzése")
+    @DisplayName("Átlós nyerés ellenőrzése")
     void testCheckWinDiagonalDownRight() {
         for (int i = 0; i < 5; i++) {
             board.applyMove(new Move(i, i), 'X');
         }
-        assertTrue(board.checkWin('X'), "Az 'X' játékosnak átlósan (↘) nyernie kellene.");
+        assertTrue(board.checkWin('X'), "Az 'X' játékosnak átlósan nyernie kellene.");
     }
 
     @Test
-    @DisplayName("Átlós ↙ nyerés ellenőrzése")
+    @DisplayName("Átlós nyerés ellenőrzése")
     void testCheckWinDiagonalDownLeft() {
         for (int i = 0; i < 5; i++) {
             board.applyMove(new Move(i, 9 - i), 'X');
         }
-        assertTrue(board.checkWin('X'), "Az 'X' játékosnak átlósan (↙) nyernie kellene.");
+        assertTrue(board.checkWin('X'), "Az 'X' játékosnak átlósan nyernie kellene.");
     }
 
     @Test
@@ -104,7 +104,7 @@ class BoardTest {
         assertFalse(board.checkWin('X'), "4 egymás melletti jel még nem nyerés.");
     }
 
-    // Segédmetódus a mező lekérésére (tesztekhez)
+
     private char getCell(int row, int col) {
         try {
             var field = Board.class.getDeclaredField("board");
@@ -120,18 +120,18 @@ class BoardTest {
     @Test
     @DisplayName("serialize() és deserialize() működése")
     void testSerializeAndDeserialize() {
-        // Lépések lerakása
+
         board.applyMove(new Move(4, 4), 'X');
         board.applyMove(new Move(4, 5), 'O');
 
-        // Mentés
+
         var saved = board.serialize();
 
-        // Új tábla betöltése
+
         Board loaded = new Board(10, 10);
         loaded.deserialize(saved);
 
-        // Ellenőrzés, hogy az állapot egyezik
+
         var loadedSaved = loaded.serialize();
         assertEquals(saved, loadedSaved, "A deszerializált tábla állapota egyezzen az eredetivel.");
     }

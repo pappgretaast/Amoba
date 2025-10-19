@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/** Represents the game board. */
+/** Ez az osztály a táblát tartalmazza. */
 public class Board {
     private final int rows;
     private final int columns;
@@ -31,13 +31,13 @@ public class Board {
     }
 
     public boolean applyMove(Move move, char symbol) {
-        // Tartományellenőrzés
+
         if (move.row() < 0 || move.row() >= rows || move.col() < 0 || move.col() >= columns)
             return false;
-        // Foglalt mező
+
         if (board[move.row()][move.col()] != '.') return false;
 
-        // Ha nem az első lépés, akkor ellenőrizzük, hogy van-e szomszéd
+
         if (firstMovePlaced && !hasAdjacentSymbol(move.row(), move.col())) {
             return false;
         }
@@ -122,7 +122,7 @@ public class Board {
             for (int c = 0; c < Math.min(columns, rowChars.length); c++) {
                 board[r][c] = rowChars[c];
                 if (rowChars[c] != '.') {
-                    firstMovePlaced = true; // Ha volt már lépés
+                    firstMovePlaced = true;
                 }
             }
         }

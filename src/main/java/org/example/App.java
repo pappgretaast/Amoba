@@ -24,12 +24,12 @@ public class App {
                 List<String> saved = fileHandler.readFile("save.txt");
                 if (!saved.isEmpty()) {
                     board.deserialize(saved);
-                    System.out.println("✅ Mentett játék betöltve!");
+                    System.out.println("Mentett játék betöltve!");
                 } else {
-                    System.out.println("⚠️ Nincs mentett játék, új játék indul.");
+                    System.out.println("Nincs mentett játék, új játék indul.");
                 }
             } catch (IOException e) {
-                System.out.println("⚠️ Hiba a betöltés közben: " + e.getMessage());
+                System.out.println("Hiba a betöltés közben: " + e.getMessage());
             }
         }
 
@@ -56,16 +56,16 @@ public class App {
             if (input.equalsIgnoreCase("mentés")) {
                 try {
                     fileHandler.writeFile("save.txt", board.serialize());
-                    System.out.println("💾 Játékállás elmentve!");
+                    System.out.println("Játékállás elmentve!");
                 } catch (IOException e) {
-                    System.out.println("⚠️ Mentési hiba: " + e.getMessage());
+                    System.out.println("Mentési hiba: " + e.getMessage());
                 }
                 continue;
             }
 
             String[] parts = input.split("\\s+");
             if (parts.length != 2) {
-                System.out.println("❌ Hibás formátum!");
+                System.out.println("Hibás formátum!");
                 continue;
             }
 
@@ -74,19 +74,19 @@ public class App {
                 r = Integer.parseInt(parts[0]) - 1;
                 c = Integer.parseInt(parts[1]) - 1;
             } catch (NumberFormatException e) {
-                System.out.println("❌ Érvénytelen számformátum!");
+                System.out.println("Érvénytelen számformátum!");
                 continue;
             }
 
             if (!board.applyMove(new Move(r, c), currentSymbol)) {
-                System.out.println("❌ Érvénytelen lépés!");
+                System.out.println("Érvénytelen lépés!");
                 continue;
             }
 
             board.printBoard();
 
             if (board.checkWin(currentSymbol)) {
-                System.out.println("🎉 Gratulálok, " + currentPlayer + " nyert!");
+                System.out.println("Gratulálok, " + currentPlayer + " nyert!");
                 break;
             }
 

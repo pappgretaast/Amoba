@@ -2,7 +2,7 @@ package org.example.model;
 
 import java.util.Objects;
 
-/** Represents a player in the game (immutable). */
+/** Ez az osztály a játékos adatait tartalmazza. */
 public final class Player {
     private final String name;
     private final char symbol;

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.*;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
-//import java.nio.file.InvalidPathException;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -61,7 +61,6 @@ class FileHandlerTest {
     @Test
     @DisplayName("writeFile IOException dobása, ha az elérési út érvénytelen")
     void testWriteFileThrowsIOException() {
-        // Windows/Linux-agnosztikus invalid path
         String invalidPath = "\0invalid:path";
 
         assertThrows(IOException.class, () ->

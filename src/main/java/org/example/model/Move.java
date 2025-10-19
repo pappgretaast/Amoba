@@ -1,6 +1,6 @@
 package org.example.model;
 
-/** Represents a move on the board (immutable). */
+/** Ez az osztály a lépésekért felel. */
 public final class Move {
     private final int row;
     private final int col;

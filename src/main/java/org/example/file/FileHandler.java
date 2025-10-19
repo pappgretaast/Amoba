@@ -6,7 +6,8 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
 
-/** Handles saving and loading game state. */
+
+/** A kiírást és a beolvasást kezeli. */
 public class FileHandler {
 
     public List<String> readFile(String path) throws IOException {
