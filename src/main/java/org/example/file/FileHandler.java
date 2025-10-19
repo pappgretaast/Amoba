@@ -9,12 +9,13 @@ import java.util.List;
 
 /** A kiírást és a beolvasást kezeli. */
 public class FileHandler {
-
+    /** Beolvas. */
     public List<String> readFile(String path) throws IOException {
         return Files.exists(Path.of(path))
                 ? Files.readAllLines(Path.of(path))
                 : List.of();
     }
+    /** Kiír. */
 
     public void writeFile(String path, List<String> content) throws IOException {
         try {

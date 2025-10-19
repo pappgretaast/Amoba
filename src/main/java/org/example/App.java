@@ -1,21 +1,30 @@
 package org.example;
 
-import org.example.board.Board;
-import org.example.file.FileHandler;
-import org.example.model.Move;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
+import org.example.board.Board;
+import org.example.file.FileHandler;
+import org.example.model.Move;
+
+/**
+ * Az Amőba játék fő osztálya.
+ * Kezeli a játék futását, mentést és betöltést.
+ */
 public class App {
+
+    /**
+     * A program belépési pontja.
+     *
+     * @param args parancssori argumentumok
+     */
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         FileHandler fileHandler = new FileHandler();
         Board board = new Board(10, 10);
 
         System.out.println("Üdv az amőba játékban!");
-
 
         System.out.print("Szeretnéd betölteni az előző játékot? (i/n): ");
         String answer = sc.nextLine().trim().toLowerCase();
@@ -32,7 +41,6 @@ public class App {
                 System.out.println("Hiba a betöltés közben: " + e.getMessage());
             }
         }
-
 
         System.out.print("Első játékos neve (X): ");
         String player1 = sc.nextLine();
@@ -69,7 +77,8 @@ public class App {
                 continue;
             }
 
-            int r, c;
+            int r;
+            int c;
             try {
                 r = Integer.parseInt(parts[0]) - 1;
                 c = Integer.parseInt(parts[1]) - 1;

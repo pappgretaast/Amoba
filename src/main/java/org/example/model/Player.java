@@ -27,8 +27,12 @@ public final class Player {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Player player)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Player player)) {
+            return false;
+        }
         return symbol == player.symbol && name.equals(player.name);
     }
 

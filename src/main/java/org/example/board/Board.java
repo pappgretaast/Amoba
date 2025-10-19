@@ -1,18 +1,26 @@
 package org.example.board;
 
-import org.example.model.Move;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/** Ez az osztály a táblát tartalmazza. */
+import org.example.model.Move;
+
+/**
+ * Ez az osztály az amőba tábla állapotát és logikáját kezeli.
+ */
 public class Board {
     private final int rows;
     private final int columns;
     private final char[][] board;
     private boolean firstMovePlaced = false;
 
+    /**
+     * Létrehoz egy új táblát a megadott méretekkel.
+     *
+     * @param rows a sorok száma
+     * @param columns az oszlopok száma
+     */
     public Board(int rows, int columns) {
         this.rows = rows;
         this.columns = columns;
@@ -22,7 +30,11 @@ public class Board {
         }
     }
 
-    /** Automatikusan lerakja az első jelet a középső mezőre */
+    /**
+     * Automatikusan lerakja az első jelet a középső mezőre.
+     *
+     * @param symbol a játékos jele (X vagy O)
+     */
     public void placeFirstMove(char symbol) {
         int centerRow = rows / 2;
         int centerCol = columns / 2;
@@ -30,13 +42,21 @@ public class Board {
         firstMovePlaced = true;
     }
 
+    /**
+     * Megpróbálja alkalmazni a megadott lépést.
+     *
+     * @param move a lépés pozíciója
+     * @param symbol a játékos jele
+     * @return igaz, ha a lépés érvényes és sikeres
+     */
     public boolean applyMove(Move move, char symbol) {
-
-        if (move.row() < 0 || move.row() >= rows || move.col() < 0 || move.col() >= columns)
+        if (move.row() < 0 || move.row() >= rows || move.col() < 0 || move.col() >= columns) {
             return false;
+        }
 
-        if (board[move.row()][move.col()] != '.') return false;
-
+        if (board[move.row()][move.col()] != '.') {
+            return false;
+        }
 
         if (firstMovePlaced && !hasAdjacentSymbol(move.row(), move.col())) {
             return false;
@@ -47,11 +67,19 @@ public class Board {
         return true;
     }
 
-    /** Ellenőrzi, hogy van-e szomszédos mező, amin már van jel */
+    /**
+     * Ellenőrzi, hogy van-e szomszédos mező, amin már van jel.
+     *
+     * @param row a vizsgált sor
+     * @param col a vizsgált oszlop
+     * @return igaz, ha van szomszédos jel
+     */
     private boolean hasAdjacentSymbol(int row, int col) {
         for (int dr = -1; dr <= 1; dr++) {
             for (int dc = -1; dc <= 1; dc++) {
-                if (dr == 0 && dc == 0) continue;
+                if (dr == 0 && dc == 0) {
+                    continue;
+                }
                 int nr = row + dr;
                 int nc = col + dc;
                 if (nr >= 0 && nr < rows && nc >= 0 && nc < columns) {
@@ -64,35 +92,67 @@ public class Board {
         return false;
     }
 
-    /** Ellenőrzi, hogy a megadott szimbólum nyert-e (5 egymás mellett) */
+    /**
+     * Ellenőrzi, hogy a megadott szimbólum nyert-e (5 egymás mellett).
+     *
+     * @param symbol a játékos jele
+     * @return igaz, ha a játékos nyert
+     */
     public boolean checkWin(char symbol) {
         int winLength = 5;
 
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < columns; c++) {
-                if (board[r][c] != symbol) continue;
+                if (board[r][c] != symbol) {
+                    continue;
+                }
 
-                if (checkDirection(r, c, 0, 1, symbol, winLength)) return true; // vízszintes
-                if (checkDirection(r, c, 1, 0, symbol, winLength)) return true; // függőleges
-                if (checkDirection(r, c, 1, 1, symbol, winLength)) return true; // átló ↘
-                if (checkDirection(r, c, 1, -1, symbol, winLength)) return true; // átló ↙
+                if (checkDirection(r, c, 0, 1, symbol, winLength)) {
+                    return true;
+                }
+                if (checkDirection(r, c, 1, 0, symbol, winLength)) {
+                    return true;
+                }
+                if (checkDirection(r, c, 1, 1, symbol, winLength)) {
+                    return true;
+                }
+                if (checkDirection(r, c, 1, -1, symbol, winLength)) {
+                    return true;
+                }
             }
         }
         return false;
     }
 
-    /** Segédmetódus: ellenőrzi, hogy adott irányban van-e 5 azonos */
+    /**
+     * Segédmetódus: ellenőrzi, hogy adott irányban van-e 5 azonos jel.
+     *
+     * @param r kezdősor
+     * @param c kezdőoszlop
+     * @param dr sorirány
+     * @param dc oszlopirány
+     * @param symbol a játékos jele
+     * @param length hány azonos kell a győzelemhez
+     * @return igaz, ha van 5 egymás mellett
+     */
     private boolean checkDirection(int r, int c, int dr, int dc, char symbol, int length) {
         for (int i = 0; i < length; i++) {
             int nr = r + dr * i;
             int nc = c + dc * i;
 
-            if (nr < 0 || nr >= rows || nc < 0 || nc >= columns) return false;
-            if (board[nr][nc] != symbol) return false;
+            if (nr < 0 || nr >= rows || nc < 0 || nc >= columns) {
+                return false;
+            }
+            if (board[nr][nc] != symbol) {
+                return false;
+            }
         }
         return true;
     }
 
+    /**
+     * Kiírja a táblát a konzolra.
+     */
     public void printBoard() {
         System.out.print("   ");
         for (int i = 1; i <= columns; i++) {
@@ -108,6 +168,11 @@ public class Board {
         }
     }
 
+    /**
+     * A tábla állapotát szöveges formában visszaadja.
+     *
+     * @return soronkénti karaktertömbök listája
+     */
     public List<String> serialize() {
         List<String> lines = new ArrayList<>();
         for (int r = 0; r < rows; r++) {
@@ -116,6 +181,11 @@ public class Board {
         return lines;
     }
 
+    /**
+     * Visszaállítja a tábla állapotát korábban mentett sorokból.
+     *
+     * @param lines a mentett sorok
+     */
     public void deserialize(List<String> lines) {
         for (int r = 0; r < Math.min(rows, lines.size()); r++) {
             char[] rowChars = lines.get(r).toCharArray();
@@ -127,5 +197,4 @@ public class Board {
             }
         }
     }
-
 }
