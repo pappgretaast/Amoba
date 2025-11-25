@@ -197,4 +197,17 @@ public class Board {
             }
         }
     }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public int getColumns() {
+        return columns;
+    }
+
+    public char getCell(int r, int c) {
+        return board[r][c];
+    }
+
 }

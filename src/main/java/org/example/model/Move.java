@@ -17,4 +17,6 @@ public final class Move {
     public int col() {
         return col;
     }
+
+
 }
