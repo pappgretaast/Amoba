@@ -132,6 +132,7 @@
               <excludes>
                 <exclude>org/example/App.class</exclude>
                 <exclude>org/example/model/Player.class</exclude>
+                <exclude>org/example/model/Move.class</exclude>
               </excludes>
             </configuration>
           </execution>
