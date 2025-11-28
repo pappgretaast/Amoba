@@ -1,13 +1,22 @@
 package org.example.database;
 
-import java.sql.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 public class HighScore {
 
-    // MÓDOSÍTVA: Fájl alapú adatbázis "./highscore"
-    // Ez a projekt gyökérmappájába menti az adatokat (highscore.mv.db néven)
+    // Logger inicializálása az osztályhoz
+    private static final Logger logger = LoggerFactory.getLogger(HighScore.class);
+
     private static final String DB_URL = "jdbc:h2:./highscore";
 
     public HighScore() {
@@ -25,52 +34,65 @@ public class HighScore {
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement st = conn.createStatement()) {
             st.execute(sql);
-        } catch (Exception e) {
-            System.out.println("Adatbázis hiba (tábla létrehozás): " + e.getMessage());
+            logger.debug("Adatbázis tábla ellenőrizve/létrehozva.");
+        } catch (SQLException e) {
+            // Hiba esetén ERROR szintű logolás, stack trace-szel
+            logger.error("Nem sikerült létrehozni az adatbázis táblát!", e);
         }
     }
 
     public void addWin(String playerName) {
-        String insert = """
-                MERGE INTO scores (name, wins)
-                KEY(name)
-                VALUES (?, COALESCE((SELECT wins FROM scores WHERE name = ?), 0) + 1);
-                """;
+        String updateSql = "UPDATE scores SET wins = wins + 1 WHERE name = ?";
+        String insertSql = "INSERT INTO scores (name, wins) VALUES (?, 1)";
 
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             PreparedStatement ps = conn.prepareStatement(insert)) {
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
 
-            ps.setString(1, playerName);
-            ps.setString(2, playerName);
-            ps.executeUpdate();
+            // 1. lépés: Próbáljunk Update-elni
+            try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
+                updatePs.setString(1, playerName);
+                int rowsAffected = updatePs.executeUpdate();
 
-            System.out.println("Eredmény mentve: " + playerName);
+                // Ha 0 sort módosított, az azt jelenti, nincs még ilyen játékos
+                if (rowsAffected == 0) {
+                    // 2. lépés: Insert
+                    try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+                        insertPs.setString(1, playerName);
+                        insertPs.executeUpdate();
+                        logger.info("Új játékos létrehozva és pont felírva: {}", playerName);
+                    }
+                } else {
+                    logger.info("Meglévő játékos pontszáma növelve: {}", playerName);
+                }
+            }
 
-        } catch (Exception e) {
-            System.out.println("Mentési hiba: " + e.getMessage());
+        } catch (SQLException e) {
+            logger.error("Hiba az eredmény mentése közben a '{}' játékosnál.", playerName, e);
         }
     }
 
     public List<String> getHighScores() {
         List<String> result = new ArrayList<>();
-        String query = "SELECT name, wins FROM scores ORDER BY wins DESC;";
+        String query = "SELECT name, wins FROM scores ORDER BY wins DESC";
 
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(query)) {
 
             while (rs.next()) {
-                result.add(rs.getString("name") + " - " + rs.getInt("wins") + " win");
+                String name = rs.getString("name");
+                int wins = rs.getInt("wins");
+                result.add(name + " - " + wins + " win");
             }
 
-        } catch (Exception e) {
-            System.out.println("Lekérdezési hiba: " + e.getMessage());
+        } catch (SQLException e) {
+            logger.error("Hiba a ranglista lekérdezése közben.", e);
         }
 
         return result;
     }
 
     public void printHighScores() {
+        // Ez maradhat System.out, mert ez a játék felhasználói felülete (UI output), nem log.
         System.out.println("\n===== RANGLISTA =====");
 
         List<String> scores = getHighScores();
